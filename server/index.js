@@ -1,22 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const { Pool } = require('pg');
+const { pool } = require('./config/database');
 
 // Cargar variables de entorno
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
-
-// Configuración de PostgreSQL
-const pool = new Pool({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'horario_db',
-  password: process.env.DB_PASSWORD || 'password',
-  port: process.env.DB_PORT || 5432,
-});
 
 // Middleware
 app.use(cors());
@@ -54,4 +45,4 @@ app.listen(port, () => {
   console.log(`Servidor ejecutándose en http://localhost:${port}`);
 });
 
-module.exports = { app, pool };
+module.exports = { app };
