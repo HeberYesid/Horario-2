@@ -4,11 +4,12 @@ import './Schedules.css';
 
 const Schedules = () => {
   const [schedules, setSchedules] = useState([]);
+  const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState(null);
   const [formData, setFormData] = useState({
-    title: '',
+    subject_id: '',
     description: '',
     day_of_week: 1,
     start_time: '',
@@ -18,6 +19,7 @@ const Schedules = () => {
 
   useEffect(() => {
     loadSchedules();
+    loadSubjects();
   }, []);
 
   const loadSchedules = async () => {
@@ -31,28 +33,79 @@ const Schedules = () => {
     }
   };
 
+  const loadSubjects = async () => {
+    try {
+      const response = await axios.get('/api/subjects');
+      setSubjects(response.data);
+    } catch (error) {
+      console.error('Error al cargar materias:', error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validación adicional
+    if (!formData.subject_id) {
+      alert('Por favor selecciona una materia');
+      return;
+    }
+
+    if (!formData.start_time || !formData.end_time) {
+      alert('Por favor completa las horas de inicio y fin');
+      return;
+    }
+
     try {
+      // Convertir subject_id a número entero
+      const scheduleData = {
+        subject_id: parseInt(formData.subject_id),
+        description: formData.description || '',
+        day_of_week: parseInt(formData.day_of_week),
+        start_time: formData.start_time,
+        end_time: formData.end_time,
+        location: formData.location || ''
+      };
+
+      console.log('Enviando datos del horario:', scheduleData); // Debug
+      
+      let response;
       if (editingSchedule) {
-        await axios.put(`/api/schedules/${editingSchedule.id}`, formData);
+        response = await axios.put(`/api/schedules/${editingSchedule.id}`, scheduleData);
       } else {
-        await axios.post('/api/schedules', formData);
+        response = await axios.post('/api/schedules', scheduleData);
       }
+      
+      console.log('Respuesta del servidor:', response.data); // Debug
       
       loadSchedules();
       resetForm();
+      alert('Horario guardado exitosamente!');
     } catch (error) {
-      console.error('Error al guardar horario:', error);
-      alert('Error al guardar el horario');
+      console.error('Error completo:', error);
+      console.error('Respuesta del servidor:', error.response);
+      
+      let errorMessage = 'Error desconocido';
+      
+      if (error.response) {
+        // El servidor respondió con un status de error
+        errorMessage = error.response.data?.error || `Error del servidor: ${error.response.status}`;
+      } else if (error.request) {
+        // La petición se hizo pero no hubo respuesta
+        errorMessage = 'No se pudo conectar con el servidor';
+      } else {
+        // Algo pasó al configurar la petición
+        errorMessage = error.message;
+      }
+      
+      alert(`Error al guardar el horario: ${errorMessage}`);
     }
   };
 
   const handleEdit = (schedule) => {
     setEditingSchedule(schedule);
     setFormData({
-      title: schedule.title,
+      subject_id: schedule.subject_id,
       description: schedule.description || '',
       day_of_week: schedule.day_of_week,
       start_time: schedule.start_time,
@@ -76,7 +129,7 @@ const Schedules = () => {
 
   const resetForm = () => {
     setFormData({
-      title: '',
+      subject_id: '',
       description: '',
       day_of_week: 1,
       start_time: '',
@@ -115,7 +168,7 @@ const Schedules = () => {
           onClick={() => setShowForm(true)}
           className="btn btn-primary"
         >
-          ➕ Nuevo Horario
+          ➕ Nuevo
         </button>
       </div>
 
@@ -129,14 +182,19 @@ const Schedules = () => {
             
             <form onSubmit={handleSubmit} className="schedule-form">
               <div className="form-group">
-                <label>Título</label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                <label>Materia</label>
+                <select
+                  value={formData.subject_id}
+                  onChange={(e) => setFormData({...formData, subject_id: e.target.value})}
                   required
-                  placeholder="Ej: Matemáticas, Gimnasio, Reunión..."
-                />
+                >
+                  <option value="">Selecciona una materia</option>
+                  {subjects.map(subject => (
+                    <option key={subject.id} value={subject.id}>
+                      {subject.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               
               <div className="form-group">
@@ -219,9 +277,13 @@ const Schedules = () => {
             <div className="day-schedules">
               {groupedSchedules[day].length > 0 ? (
                 groupedSchedules[day].map(schedule => (
-                  <div key={schedule.id} className="schedule-card">
+                  <div 
+                    key={schedule.id} 
+                    className="schedule-card"
+                    style={{ borderLeft: `4px solid ${schedule.subject_color || '#95A5A6'}` }}
+                  >
                     <div className="schedule-header">
-                      <h4>{schedule.title}</h4>
+                      <h4>{schedule.subject_name}</h4>
                       <div className="schedule-actions">
                         <button 
                           onClick={() => handleEdit(schedule)}

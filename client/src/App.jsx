@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Schedules from './pages/Schedules';
 import Profile from './pages/Profile';
+import AdminSubjects from './pages/AdminSubjects';
 import './App.css';
 
 // Componente para rutas protegidas
@@ -78,6 +79,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Profile />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/subjects" 
+                element={
+                  <ProtectedRoute>
+                    <AdminSubjects />
                   </ProtectedRoute>
                 } 
               />

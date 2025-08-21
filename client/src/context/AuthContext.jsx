@@ -60,9 +60,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, educationLevel) => {
     try {
-      const response = await axios.post('/api/auth/register', { name, email, password });
+      const response = await axios.post('/api/auth/register', { 
+        name, 
+        email, 
+        password, 
+        educationLevel 
+      });
       const { user, token } = response.data;
       
       localStorage.setItem('token', token);

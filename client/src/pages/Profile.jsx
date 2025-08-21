@@ -7,7 +7,8 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
-    email: user?.email || ''
+    email: user?.email || '',
+    educationLevel: user?.education_level || ''
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -35,7 +36,8 @@ const Profile = () => {
   const handleCancel = () => {
     setFormData({
       name: user?.name || '',
-      email: user?.email || ''
+      email: user?.email || '',
+      educationLevel: user?.education_level || ''
     });
     setIsEditing(false);
     setMessage('');
@@ -100,6 +102,20 @@ const Profile = () => {
                   />
                 </div>
 
+                <div className="form-group">
+                  <label htmlFor="educationLevel">Nivel de educación</label>
+                  <select
+                    id="educationLevel"
+                    value={formData.educationLevel}
+                    onChange={(e) => setFormData({...formData, educationLevel: e.target.value})}
+                  >
+                    <option value="">Seleccionar nivel</option>
+                    <option value="transicion">Transición</option>
+                    <option value="primaria">Primaria</option>
+                    <option value="bachillerato">Bachillerato</option>
+                  </select>
+                </div>
+
                 <div className="form-actions">
                   <button 
                     type="button" 
@@ -127,6 +143,18 @@ const Profile = () => {
                 <div className="info-item">
                   <label>Email</label>
                   <p>{user?.email}</p>
+                </div>
+
+                <div className="info-item">
+                  <label>Nivel de educación</label>
+                  <p>
+                    {user?.education_level ? (
+                      user.education_level === 'transicion' ? 'Transición' :
+                      user.education_level === 'primaria' ? 'Primaria' :
+                      user.education_level === 'bachillerato' ? 'Bachillerato' :
+                      user.education_level
+                    ) : 'No especificado'}
+                  </p>
                 </div>
 
                 <div className="info-item">

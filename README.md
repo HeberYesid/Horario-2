@@ -40,10 +40,10 @@ cd "Horario 2"
 ```
 
 ### 2. Configurar la base de datos
-1. Crear una base de datos PostgreSQL llamada `schedule_management`
+1. Crear una base de datos PostgreSQL llamada `horario_db`
 2. Ejecutar el script de esquema:
 ```bash
-psql -U tu_usuario -d schedule_management -f server/database/schema.sql
+psql -U tu_usuario -d horario_db -f server/database/schema.sql
 ```
 
 ### 3. Configurar el backend

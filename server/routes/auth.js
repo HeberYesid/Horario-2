@@ -8,7 +8,7 @@ const router = express.Router();
 // Registro de usuario
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, educationLevel } = req.body;
 
     // Verificar si el usuario ya existe
     const userExists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
@@ -17,14 +17,20 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'El usuario ya existe' });
     }
 
+    // Validar el nivel de educación si se proporciona
+    const validEducationLevels = ['transicion', 'primaria', 'bachillerato'];
+    if (educationLevel && !validEducationLevels.includes(educationLevel)) {
+      return res.status(400).json({ error: 'Nivel de educación no válido' });
+    }
+
     // Encriptar contraseña
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Insertar usuario en la base de datos
     const newUser = await pool.query(
-      'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email',
-      [name, email, hashedPassword]
+      'INSERT INTO users (name, email, password, education_level) VALUES ($1, $2, $3, $4) RETURNING id, name, email, education_level',
+      [name, email, hashedPassword, educationLevel || null]
     );
 
     // Generar JWT

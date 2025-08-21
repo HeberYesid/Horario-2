@@ -1,0 +1,4 @@
+{
+    "dbMcp.provider": "postgresql",
+    "dbMcp.connectionString": "postgresql://postgres:password@localhost:5432/horario_db"
+}

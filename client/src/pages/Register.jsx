@@ -8,7 +8,8 @@ const Register = () => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    educationLevel: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -39,7 +40,7 @@ const Register = () => {
 
     setLoading(true);
 
-    const result = await register(formData.name, formData.email, formData.password);
+    const result = await register(formData.name, formData.email, formData.password, formData.educationLevel);
     
     if (result.success) {
       navigate('/dashboard');
@@ -82,6 +83,22 @@ const Register = () => {
               required
               placeholder="tu@email.com"
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="educationLevel">Nivel de educación</label>
+            <select
+              id="educationLevel"
+              name="educationLevel"
+              value={formData.educationLevel}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Selecciona tu nivel de educación</option>
+              <option value="transicion">Transición</option>
+              <option value="primaria">Primaria</option>
+              <option value="bachillerato">Bachillerato</option>
+            </select>
           </div>
           
           <div className="form-group">
